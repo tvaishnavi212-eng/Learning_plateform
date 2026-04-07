@@ -1,11 +1,12 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import dns from "dns";
 
 import connectDB from "./configs/mongodb.js";
-import dns, { setServers } from "dns";
 import { clerkWebhooks } from "./controllers/webhooks.js";
-//change dns
+
+// fix DNS (ok to keep)
 dns.setServers(["1.1.1.1", "8.8.8.8"]);
 
 dotenv.config();
@@ -16,16 +17,25 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// database
-await connectDB();
+// ✅ FIX: DB connection (serverless safe)
+let isConnected = false;
+
+const connect = async () => {
+  if (isConnected) return;
+  const db = await connectDB();
+  isConnected = true;
+};
 
 // routes
-app.get("/", (req, res) => res.send("API Working 🚀"));
-app.post("/clerk", express.json(), clerkWebhooks);
-
-// port
-const PORT = process.env.PORT || 5000;
-
-app.listen(PORT, () => {
-  console.log(`Server is Running on ${PORT}`);
+app.get("/", async (req, res) => {
+  await connect();
+  res.send("API Working 🚀");
 });
+
+app.post("/clerk", async (req, res) => {
+  await connect();
+  return clerkWebhooks(req, res);
+});
+
+// ✅ EXPORT THIS
+export default app;
