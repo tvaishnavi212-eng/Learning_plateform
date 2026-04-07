@@ -6,7 +6,6 @@ import dns from "dns";
 import connectDB from "./configs/mongodb.js";
 import { clerkWebhooks } from "./controllers/webhooks.js";
 
-// fix DNS (ok to keep)
 dns.setServers(["1.1.1.1", "8.8.8.8"]);
 
 dotenv.config();
@@ -17,25 +16,39 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ✅ FIX: DB connection (serverless safe)
+// ✅ DB connection (SAFE)
 let isConnected = false;
 
 const connect = async () => {
-  if (isConnected) return;
-  const db = await connectDB();
-  isConnected = true;
+  try {
+    if (isConnected) return;
+    await connectDB();
+    isConnected = true;
+    console.log("DB Connected");
+  } catch (error) {
+    console.error("DB Error:", error.message);
+    throw error; // important
+  }
 };
 
 // routes
 app.get("/", async (req, res) => {
-  await connect();
-  res.send("API Working 🚀");
+  try {
+    await connect();
+    res.send("API Working 🚀");
+  } catch (error) {
+    res.status(500).json({ error: "Server Error" });
+  }
 });
 
 app.post("/clerk", async (req, res) => {
-  await connect();
-  return clerkWebhooks(req, res);
+  try {
+    await connect();
+    return clerkWebhooks(req, res);
+  } catch (error) {
+    res.status(500).json({ error: "Webhook Error" });
+  }
 });
 
-// ✅ EXPORT THIS
+// ✅ EXPORT
 export default app;
