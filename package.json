@@ -15,6 +15,7 @@
   "dependencies": {
     "@clerk/clerk-react": "^5.61.4",
     "@tailwindcss/vite": "^4.2.1",
+    "@vitejs/plugin-react": "^5.1.1",
     "axios": "^1.15.0",
     "clerk": "^0.8.3",
     "humanize-duration": "^3.33.2",
