@@ -1,10 +1,11 @@
-import React, { useContext } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import CourseCard from "./CourseCard";
-import { AppContext } from "../../context/AppContext";
+import { dummyCourses } from "../../assets/assets";
 
 const CoursesSection = () => {
-  const { allCourses } = useContext(AppContext);
+  // Show first 4 courses from dummyCourses
+  const homeCourses = dummyCourses.slice(0, 4);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-12">
@@ -29,7 +30,7 @@ const CoursesSection = () => {
         lg:grid-cols-3 
         xl:grid-cols-4"
       >
-        {(allCourses || []).slice(0, 4).map((course) => (
+        {homeCourses.map((course) => (
           <div
             key={course._id || course.id}
             className="transition duration-300 hover:scale-105"

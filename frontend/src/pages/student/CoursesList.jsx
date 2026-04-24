@@ -1,20 +1,47 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import SearchBar from "../../components/student/SearchBar";
 import CourseCard from "../../components/student/CourseCard";
-import { AppContext } from "../../context/AppContext";
-import assets from "../../assets/assets"; // ✅ FIX
+import assets, { dummyCourses } from "../../assets/assets"; // ✅ FIX
 
 const CoursesList = () => {
   const navigate = useNavigate();
-  const { allCourses } = useContext(AppContext);
   const { input } = useParams();
 
   const [filteredCourses, setFilteredCourses] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  // Hotkeys for navigation
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      // Only handle hotkeys if we have courses
+      if (!filteredCourses || filteredCourses.length === 0) return;
+      
+      if (event.key === 'ArrowRight') {
+        event.preventDefault();
+        setCurrentIndex((prev) => (prev + 1) % filteredCourses.length);
+      } else if (event.key === 'ArrowLeft') {
+        event.preventDefault();
+        setCurrentIndex((prev) => (prev - 1 + filteredCourses.length) % filteredCourses.length);
+      } else if (event.key === 'Enter') {
+        event.preventDefault();
+        if (filteredCourses[currentIndex]) {
+          const courseId = filteredCourses[currentIndex]._id || filteredCourses[currentIndex].id;
+          navigate(`/course/${courseId}`);
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [filteredCourses, navigate]);
 
   useEffect(() => {
-    if (allCourses && allCourses.length > 0) {
-      const tempCourses = [...allCourses];
+    if (dummyCourses && dummyCourses.length > 0) {
+      const tempCourses = [...dummyCourses];
 
       if (input) {
         const filtered = tempCourses.filter((item) =>
@@ -25,7 +52,7 @@ const CoursesList = () => {
         setFilteredCourses(tempCourses);
       }
     }
-  }, [allCourses, input]); // ✅ FIX
+  }, [dummyCourses, input]); // ✅ FIX
 
   return (
     <div className="relative md:px-36 px-8 pt-20 text-left">
@@ -64,7 +91,11 @@ const CoursesList = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
         {filteredCourses?.length > 0 ? (
           filteredCourses.map((course, index) => (
-            <CourseCard key={index} course={course} />
+            <CourseCard 
+              key={index} 
+              course={course} 
+              isSelected={index === currentIndex}
+            />
           ))
         ) : (
           <p className="text-gray-500 col-span-full text-center">
@@ -72,6 +103,15 @@ const CoursesList = () => {
           </p>
         )}
       </div>
+      
+      {/* Navigation Indicator */}
+      {filteredCourses?.length > 0 && (
+        <div className="fixed bottom-4 left-1/2 right-1/2 flex justify-center items-center gap-2 bg-black/50 text-white px-4 py-2 rounded-lg">
+          <span className="text-sm">
+            {currentIndex + 1} / {filteredCourses.length} - Use ← → to navigate, Enter to open
+          </span>
+        </div>
+      )}
     </div>
   );
 };

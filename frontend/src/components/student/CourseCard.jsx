@@ -1,10 +1,9 @@
-import React, { useContext } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import assets from "../../assets/assets";
-import { AppContext } from "../../context/AppContext";
 
-const CourseCard = ({ course }) => {
-  const { currency } = useContext(AppContext);
+const CourseCard = ({ course, isSelected }) => {
+  const currency = "₹"; // Default currency
 
   if (!course) return null;
 
@@ -15,19 +14,32 @@ const CourseCard = ({ course }) => {
   // ✅ FIX: handle both id types
   const courseId = course._id || course.id;
 
+  // Calculate average rating
+  const averageRating = course.courseRatings?.length > 0 
+    ? (course.courseRatings.reduce((sum, r) => sum + r.rating, 0) / course.courseRatings.length).toFixed(1)
+    : 4.5;
+
   return (
     <Link
       to={`/course/${courseId}`} // ✅ FIXED
       onClick={() => window.scrollTo(0, 0)}
-      className="group block bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition duration-300 hover:-translate-y-2"
+      className={`group block bg-white border rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition duration-300 hover:-translate-y-2 ${
+        isSelected ? 'ring-2 ring-blue-500 border-blue-500' : 'border-gray-200'
+      }`}
     >
       {/* Image */}
-      <div className="overflow-hidden">
+      <div className="overflow-hidden relative">
         <img
           className="w-full h-44 object-center group-hover:scale-105 transition duration-300"
           src={course.courseThumbnail}
           alt={course.courseTitle}
         />
+        {/* Selection Indicator */}
+        {isSelected && (
+          <div className="absolute top-2 right-2 bg-blue-500 text-white text-xs px-2 py-1 rounded">
+            Currently Selected
+          </div>
+        )}
       </div>
 
       {/* Content */}
@@ -37,13 +49,13 @@ const CourseCard = ({ course }) => {
         </h3>
 
         <p className="text-sm text-gray-500 mt-1">
-          {course.educator?.name || "Instructor"} {/* ✅ SAFE FIX */}
+          {course.educator?.name || "GreatStack"} {/* ✅ SAFE FIX */}
         </p>
 
         {/* Rating */}
         <div className="flex items-center gap-1 mt-2">
           <span className="text-yellow-500 font-medium text-sm">
-            {course.rating || 4.5}
+            {averageRating}
           </span>
 
           <div className="flex">
@@ -53,7 +65,7 @@ const CourseCard = ({ course }) => {
                 src={assets.star}
                 alt="star"
                 className={`w-4 h-4 ${
-                  i < Math.floor(course.rating || 4.5)
+                  i < Math.floor(averageRating)
                     ? "opacity-100"
                     : "opacity-30"
                 }`}
@@ -62,8 +74,14 @@ const CourseCard = ({ course }) => {
           </div>
 
           <span className="text-gray-400 text-xs ml-1">
-            ({course.reviews || 22})
+            ({course.courseRatings?.length || 22})
           </span>
+        </div>
+
+        {/* Course Stats */}
+        <div className="mt-3 text-sm text-gray-600">
+          <p>📚 {course.courseContent?.length || 0} Chapters</p>
+          <p>👥 {course.enrolledStudents?.length || 0} Students</p>
         </div>
 
         {/* Price */}

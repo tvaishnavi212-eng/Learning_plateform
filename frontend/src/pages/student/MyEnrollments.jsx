@@ -1,11 +1,16 @@
-import React, { useContext, useState } from "react";
-import { AppContext } from "../../context/AppContext";
+import React, { useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { Line } from "rc-progress";
 import Footer from "../../components/student/Footer";
+import { dummyCourses } from "../../assets/assets";
+import humanizeDuration from "humanize-duration";
 
 const MyEnrollments = () => {
-  const { enrolledCourses, calculateCourseDuration, navigate } =
-    useContext(AppContext);
+  const { courseId: currentCourseId } = useParams();
+  const navigate = useNavigate();
+
+  // Simulate enrolled courses (first 5 from dummyCourses)
+  const enrolledCourses = dummyCourses.slice(0, 5);
 
   const [progressArray] = useState([
     { lectureCompleted: 2, totalLectures: 4 },
@@ -13,13 +18,21 @@ const MyEnrollments = () => {
     { lectureCompleted: 3, totalLectures: 5 },
     { lectureCompleted: 4, totalLectures: 6 },
     { lectureCompleted: 0, totalLectures: 4 },
-    { lectureCompleted: 2, totalLectures: 4 },
-    { lectureCompleted: 5, totalLectures: 6 },
-    { lectureCompleted: 2, totalLectures: 7 },
-    { lectureCompleted: 1, totalLectures: 4 },
-    { lectureCompleted: 3, totalLectures: 8 },
-    { lectureCompleted: 2, totalLectures: 5 },
   ]);
+
+  // Calculate course duration helper
+  const calculateCourseDuration = (course) => {
+    if (!course.courseContent) return "0 min";
+    let totalDuration = 0;
+    course.courseContent.forEach((chapter) => {
+      const chapterDuration = chapter.chapterContent?.reduce(
+        (sum, lecture) => sum + (lecture.lectureDuration || 0),
+        0
+      ) || 0;
+      totalDuration += chapterDuration;
+    });
+    return humanizeDuration(totalDuration * 60 * 1000, { units: ["h", "m"], round: true });
+  };
 
   return (
     <>

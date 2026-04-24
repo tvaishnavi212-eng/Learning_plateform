@@ -1,10 +1,9 @@
 import React from "react";
-import assets, { dummyEducatorData } from "../../assets/assets";
-import { UserButton, useUser } from "@clerk/react";
+import assets from "../../assets/assets";
 import { Link } from "react-router-dom";
+import { UserButton, useUser, SignInButton } from "@clerk/clerk-react";
 
 const Navbar = () => {
-  const educatorData = dummyEducatorData;
   const { user } = useUser();
 
   return (
@@ -16,16 +15,16 @@ const Navbar = () => {
 
       {/* Right Section */}
       <div className="flex items-center gap-3">
-        <p className="text-sm">Hi! {user ? user.fullName : "Developers"}</p>
+        <p className="text-sm">Hi! {user ? user.fullName : "Guest"}</p>
 
         {user ? (
           <UserButton />
         ) : (
-          <img
-            className="w-8 h-8 rounded-full"
-            src={assets.profile_img}
-            alt="profile"
-          />
+          <SignInButton mode="modal">
+            <button className="bg-blue-500 text-white px-4 py-1 rounded">
+              Login
+            </button>
+          </SignInButton>
         )}
       </div>
     </div>

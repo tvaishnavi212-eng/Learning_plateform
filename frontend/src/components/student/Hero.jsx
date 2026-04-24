@@ -8,7 +8,7 @@ const Hero = () => {
       <h1 className="md:text-5xl text-3xl relative font-bold text-gray-800 max-w-3xl mx-auto">
         Empower your future with the Course designed to{" "}
         <span className="text-blue-600">
-          fit your choice of Software Testing
+          fit your choice of Software Development
         </span>
         <img
           src={assetssketch}
@@ -18,8 +18,8 @@ const Hero = () => {
       </h1>
 
       <p className="max-w-2xl text-gray-600">
-        Welcome to your learning journey in Software Testing. Join our platform
-        to master Manual Testing, Automation Testing, and real-time projects.
+        Welcome to your learning journey in Software Development. Join our platform
+        to master Frontend , Backend, and real-time projects.
         Learn from experts, practice with live test cases, and get ready to
         crack interviews with confidence.
       </p>

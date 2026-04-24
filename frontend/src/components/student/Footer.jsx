@@ -51,7 +51,7 @@ const Footer = () => {
           </div>
         </div>
       </div>
-      <p className="text-white/70 text-sm py-4" text-center>
+      <p className="text-white/70 text-sm py-4 text-center">
         Copyright 2026 @ GreatStack. All Right Reserved
       </p>
     </footer>

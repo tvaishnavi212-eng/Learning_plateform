@@ -1,13 +1,11 @@
-import React, { useContext, useState, useEffect } from "react";
-import { AppContext } from "../../context/AppContext";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { assets } from "../../assets/assets";
+import { assets, dummyCourses } from "../../assets/assets";
 import humanizeDuration from "humanize-duration";
 import YouTube from "react-youtube";
 import { Rating } from "react-simple-star-rating";
 
 const Player = () => {
-  const { enrolledCourses, calculateChapterTime } = useContext(AppContext);
   const { courseId } = useParams();
 
   const [courseData, setCourseData] = useState(null);
@@ -17,9 +15,19 @@ const Player = () => {
 
   // Fetch Course Data
   useEffect(() => {
-    const course = enrolledCourses.find((course) => course._id === courseId);
+    const course = dummyCourses.find((course) => course._id === courseId);
     setCourseData(course);
-  }, [courseId, enrolledCourses]);
+  }, [courseId]);
+
+  // Calculate chapter time helper
+  const calculateChapterTime = (chapter) => {
+    if (!chapter.chapterContent) return "0 min";
+    const totalDuration = chapter.chapterContent.reduce(
+      (sum, lecture) => sum + (lecture.lectureDuration || 0),
+      0
+    );
+    return humanizeDuration(totalDuration * 60 * 1000, { units: ["m"], round: true });
+  };
 
   // Toggle Accordion
   const toggleSection = (index) => {
